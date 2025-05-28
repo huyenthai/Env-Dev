@@ -5,6 +5,7 @@ services:
      context: ../authentication-service
     ports:
       - "5000:8080"
+    env_file: .env
     environment:
       - Jwt__Key=${Jwt__Key}
       - ConnectionStrings__DefaultConnection=${ConnectionStrings__AuthDb}
@@ -19,6 +20,7 @@ services:
      context: ../user-service
     ports:
       - "5001:8080"
+    env_file: .env
     environment:
       - Jwt__Key=${Jwt__Key}
       - ConnectionStrings__DefaultConnection=${ConnectionStrings__UserDb}
