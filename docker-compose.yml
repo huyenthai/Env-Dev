@@ -1,8 +1,8 @@
-﻿version: "3.9"
-services:
+﻿services:
   auth-service:
     build: 
      context: ../authentication-service
+     dockerfile: ./Dockerfile
     ports:
       - "5000:8080"
     env_file: .env
@@ -18,6 +18,7 @@ services:
   user-service:
     build: 
      context: ../user-service
+     dockerfile: ./Dockerfile
     ports:
       - "5001:8080"
     env_file: .env
@@ -41,8 +42,8 @@ services:
   user-db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
-      SA_PASSWORD: ${DB_PASSWORD}
-      ACCEPT_EULA: "Y"
+     SA_PASSWORD: ${DB_PASSWORD}
+     ACCEPT_EULA: "Y"
     ports:
       - "1434:1433"
 
@@ -51,3 +52,49 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RabbitMq__User}
+      - RABBITMQ_DEFAULT_PASS=${RabbitMq__Password}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  chat-service:
+    build:
+      context: ../chat-service
+      dockerfile: ./Dockerfile
+    ports:
+      - "5002:8080"
+    depends_on:
+      - mongo-db
+    env_file: .env
+    environment:
+      - Jwt__Key=${Jwt__Key}
+      - MongoDb__ConnectionString=mongodb://mongo-db:27017
+      - MongoDb__Database=ChatApp
+      - ASPNETCORE_ENVIRONMENT=Production
+
+  mongo-db:
+    image: mongo
+    container_name: mongo-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  media-service:
+    build:
+      context: ../media-service
+      dockerfile: ./Dockerfile
+    ports:
+      - "5003:8080"
+    env_file: .env
+    environment:
+      - AzureBlob__ConnectionString=${AzureBlob__ConnectionString}
+      - AzureBlob__ContainerName=media
+      - Jwt__Key=${Jwt__Key}
+volumes:
+  rabbitmq_data:
+  mongo_data:
+
+
+
