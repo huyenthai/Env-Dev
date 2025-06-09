@@ -1,7 +1,7 @@
 ﻿services:
   auth-service:
     build: 
-     context: ../authentication-service
+     context: ../Authentication-Service
      dockerfile: ./Dockerfile
     ports:
       - "5000:8080"
@@ -17,7 +17,7 @@
 
   user-service:
     build: 
-     context: ../user-service
+     context: ../User-Service
      dockerfile: ./Dockerfile
     ports:
       - "5001:8080"
@@ -60,7 +60,7 @@
 
   chat-service:
     build:
-      context: ../chat-service
+      context: ../Chat-Service
       dockerfile: ./Dockerfile
     ports:
       - "5002:8080"
@@ -81,9 +81,21 @@
     volumes:
       - mongo_data:/data/db
 
+  frontend:
+    build:
+      context: ../Messaging-Application-FE/messaging-app
+      dockerfile: ./Dockerfile
+    ports:
+      - "8081:80"  
+    depends_on:
+      - auth-service
+      - user-service
+      - chat-service
+      - media-service
+
   media-service:
     build:
-      context: ../media-service
+      context: ../Media-Service
       dockerfile: ./Dockerfile
     ports:
       - "5003:8080"
